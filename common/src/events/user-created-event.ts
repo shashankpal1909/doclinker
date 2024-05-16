@@ -15,7 +15,11 @@ export interface UserCreatedEvent {
   data: {
     id: string;
     email: string;
+    role: "doctor" | "patient" | "admin";
+    dob: Date;
+    gender: "male" | "female" | "other";
     fullName: string;
-    userName: string;
+    phoneNumber: string | null;
+    emailVerified: Date | null;
   };
 }

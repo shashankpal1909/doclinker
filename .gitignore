@@ -131,3 +131,9 @@ dist
 
 # idx
 .idx
+
+# vscode
+.vscode
+
+# docker dev volumes
+.volumes

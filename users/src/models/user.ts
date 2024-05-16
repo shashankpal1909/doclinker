@@ -2,12 +2,27 @@ import mongoose from "mongoose";
 
 import { Password } from "../services/password";
 
+export enum UserRole {
+  ADMIN = "admin",
+  PATIENT = "patient",
+  DOCTOR = "doctor",
+}
+
+export enum Gender {
+  MALE = "male",
+  FEMALE = "female",
+  OTHER = "other",
+}
+
 // An interface that describes the properties required to create a User.
 interface UserAttrs {
   email: string;
   password: string;
+  dob: Date;
+  gender: Gender;
+  role: UserRole;
   fullName: string;
-  userName: string;
+  phoneNumber: string | null;
 }
 
 // An interface that describes the properties a User model has.
@@ -19,8 +34,12 @@ interface UserModel extends mongoose.Model<UserDoc> {
 interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
+  role: UserRole;
+  dob: Date;
+  gender: Gender;
   fullName: string;
-  userName: string;
+  phoneNumber: string | null;
+  emailVerified: Date | null;
 }
 
 // Schema for the user collection
@@ -39,10 +58,28 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userName: {
+    phoneNumber: {
+      type: String,
+      default: null,
+    },
+    emailVerified: {
+      type: Date,
+      default: null,
+    },
+    role: {
+      type: String,
+      default: UserRole.PATIENT,
+      required: true,
+      enum: Object.values(UserRole),
+    },
+    dob: {
+      type: Date,
+      required: true,
+    },
+    gender: {
       type: String,
       required: true,
-      unique: true,
+      enum: Object.values(Gender),
     },
   },
   {
@@ -60,10 +97,16 @@ const userSchema = new mongoose.Schema(
 
 // Middleware: Hash the password before saving
 userSchema.pre("save", async function (done) {
+  // Check if the password has been modified
   if (this.isModified("password")) {
+    // Hash the password using the Password service
     const hashed = await Password.toHash(this.get("password"));
+
+    // Set the hashed password on the user document
     this.set("password", hashed);
   }
+
+  // Call the done callback to continue the save operation
   done();
 });
 

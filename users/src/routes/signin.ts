@@ -6,6 +6,8 @@ import { BadRequestError, validateRequest } from "../../../common/src";
 
 import { User } from "../models/user";
 import { Password } from "../services/password";
+import { Mail } from "../services/mail";
+import { Token, TokenType } from "../models/token";
 
 // Create an Express router
 const router = express.Router();
@@ -37,6 +39,21 @@ router.post(
     );
     if (!passwordsMatch) {
       throw new BadRequestError("Invalid Login Credentials");
+    }
+
+    // Check for email verification
+    if (!existingUser.emailVerified) {
+      // Create an email verification token
+      const token = Token.build({
+        userId: existingUser.id,
+        type: TokenType.EMAIL_VERIFICATION,
+      });
+      await token.save();
+
+      // Send email verification link
+      Mail.sendEmailVerificationLink(existingUser.email, token.value);
+
+      throw new BadRequestError("Email not verified");
     }
 
     // Generate a JWT (JSON Web Token)

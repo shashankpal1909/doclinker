@@ -1,4 +1,3 @@
-// Import dependencies
 import "express-async-errors";
 
 import { json } from "body-parser";
@@ -8,11 +7,17 @@ import morgan from "morgan";
 
 import { currentUser, errorHandler, NotFoundError } from "../../common/src";
 
+import { API_BASE_URL } from "./constants";
+
 // Import routes
+import { changePasswordRouter } from "./routes/change-password";
 import { currentUserRouter } from "./routes/current-user";
+import { forgotPasswordRouter } from "./routes/forgot-password";
+import { resetPasswordRouter } from "./routes/reset-password";
 import { signInRouter } from "./routes/signin";
 import { signOutRouter } from "./routes/signout";
 import { signUpRouter } from "./routes/signup";
+import { verifyEmailRouter } from "./routes/verify-email";
 
 // Initialize the express app
 const app = express();
@@ -23,25 +28,29 @@ app.use(morgan("dev"));
 app.use(
   cookieSession({
     signed: false,
-    secure: process.env.NODE_ENV !== "test",
+    secure: process.env.NODE_ENV === "production",
   })
 );
 
 // Health check route
-app.get("/v1/health", (req, res) => {
+app.get(`${API_BASE_URL}/health`, (_req, res) => {
   res.status(200).send({ message: "Hello World" });
 });
 
-app.use(currentUser)
+app.use(currentUser);
 
 // Mount routes
-app.use("/v1", currentUserRouter);
-app.use("/v1", signUpRouter);
-app.use("/v1", signInRouter);
-app.use("/v1", signOutRouter);
+app.use(API_BASE_URL, changePasswordRouter);
+app.use(API_BASE_URL, currentUserRouter);
+app.use(API_BASE_URL, forgotPasswordRouter);
+app.use(API_BASE_URL, resetPasswordRouter);
+app.use(API_BASE_URL, signInRouter);
+app.use(API_BASE_URL, signOutRouter);
+app.use(API_BASE_URL, signUpRouter);
+app.use(API_BASE_URL, verifyEmailRouter);
 
 // Define 404 Not Found handler
-app.all("*", async (req, res) => {
+app.all("*", async (_req, _res) => {
   throw new NotFoundError();
 });
 

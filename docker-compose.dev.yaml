@@ -4,7 +4,7 @@ services:
   users:
     build:
       context: .
-      dockerfile: ./users/Dockerfile
+      dockerfile: ./users/Dockerfile.dev
     env_file:
       - ./users/.env
     volumes:
@@ -12,6 +12,16 @@ services:
       - ./common:/common
     ports:
       - "3001:3000"
+  
+  users-db:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=doclinker
+      - MONGO_INITDB_ROOT_PASSWORD=doclinker
+    volumes:
+      - ./.volumes/users-db:/data/db
 
   amqp:
     image: rabbitmq:management
@@ -19,5 +29,5 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      - RABBITMQ_DEFAULT_USER=docspot
-      - RABBITMQ_DEFAULT_PASS=docspot
+      - RABBITMQ_DEFAULT_USER=doclinker
+      - RABBITMQ_DEFAULT_PASS=doclinker

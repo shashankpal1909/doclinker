@@ -1,6 +1,6 @@
 import { Publisher, Subjects, UserCreatedEvent } from "../../../../common/src";
 
-import { AMQP_EXCHANGE } from "../constants";
+import { AMQP_EXCHANGE } from "../../constants";
 
 // Publisher for the user created event.
 export class UserCreatedPublisher extends Publisher<UserCreatedEvent> {

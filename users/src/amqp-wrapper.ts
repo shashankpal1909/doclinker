@@ -1,4 +1,5 @@
 import amqp, { Channel, Connection } from "amqplib";
+import { AMQP_EXCHANGE } from "./events/constants";
 
 // Manages an AMQP connection.
 class AMQPWrapper {
@@ -18,7 +19,7 @@ class AMQPWrapper {
       this._channel = await this._connection.createChannel();
       console.log("Channel Created!");
 
-      await this._channel.assertExchange("linkloop.direct", "direct", {
+      await this._channel.assertExchange(AMQP_EXCHANGE, "direct", {
         durable: true,
       });
       console.log("Exchange Asserted");

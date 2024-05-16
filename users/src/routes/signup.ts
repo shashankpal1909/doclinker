@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import jwt from "jsonwebtoken";
 
 import { BadRequestError, validateRequest } from "../../../common/src";
 
 import { amqpWrapper } from "../amqp-wrapper";
 import { UserCreatedPublisher } from "../events/publishers/user-created-publisher";
-import { User } from "../models/user";
+import { Gender, User, UserRole } from "../models/user";
+import { Mail } from "../services/mail";
+import { Token, TokenType } from "../models/token";
 
 // Create an Express router
 const router = express.Router();
@@ -24,15 +25,26 @@ router.post(
       .trim()
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
-    body("fullName").trim().not().isEmpty().withMessage("Invalid Name"),
-    body("userName")
+    body("role")
       .trim()
-      .isLength({ min: 4, max: 32 })
-      .withMessage("Invalid Username"),
+      .isIn(Object.values(UserRole))
+      .withMessage("Invalid Role"),
+    body("gender")
+      .trim()
+      .isIn(Object.values(Gender))
+      .withMessage("Invalid Gender"),
+    body("dob").isDate().withMessage("Invalid DOB"),
+    body("fullName").trim().not().isEmpty().withMessage("Invalid Name"),
+    body("phoneNumber")
+      .optional()
+      .trim()
+      .isMobilePhone("any")
+      .withMessage("Invalid Phone Number"),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password, fullName, userName } = req.body;
+    const { email, password, role, dob, gender, fullName, phoneNumber } =
+      req.body;
 
     // Check if email is already in use
     let existingUser = await User.findOne({ email });
@@ -40,24 +52,27 @@ router.post(
       throw new BadRequestError("Email already in use");
     }
 
-    // Check if username is already in use
-    existingUser = await User.findOne({ userName });
-    if (existingUser) {
-      throw new BadRequestError("Username already in use");
-    }
-
     // Create a new user
-    const user = User.build({ email, password, fullName, userName });
+    const user = User.build({
+      email,
+      password,
+      role,
+      fullName,
+      phoneNumber,
+      dob,
+      gender,
+    });
     await user.save();
 
-    // Generate a JWT (JSON Web Token)
-    const userJWT = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_KEY!
-    );
+    // Create an email verification token
+    const token = Token.build({
+      userId: user.id,
+      type: TokenType.EMAIL_VERIFICATION,
+    });
+    await token.save();
 
-    // Store the JWT on the session object
-    req.session = { jwt: userJWT };
+    // Send email verification link
+    Mail.sendEmailVerificationLink(user.email, token.value);
 
     // Publish a user-created event
     new UserCreatedPublisher(
@@ -66,8 +81,12 @@ router.post(
     ).publish({
       id: user.id,
       email: user.email,
+      role: user.role,
+      dob: user.dob,
+      gender: user.gender,
       fullName: user.fullName,
-      userName: user.userName,
+      phoneNumber: user.phoneNumber,
+      emailVerified: user.emailVerified,
     });
 
     // Send a successful response
