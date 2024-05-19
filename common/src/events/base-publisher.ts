@@ -33,7 +33,7 @@ export abstract class Publisher<T extends Event> {
    */
   async publish(data: T["data"]): Promise<void> {
     try {
-      await this.channel.assertExchange(this.exchange, "direct", {
+      await this.channel.assertExchange(this.exchange, "topic", {
         durable: true,
       });
       const message = Buffer.from(JSON.stringify(data));

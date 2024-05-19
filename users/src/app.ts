@@ -6,10 +6,7 @@ import express from "express";
 import morgan from "morgan";
 
 import { currentUser, errorHandler, NotFoundError } from "../../common/src";
-
 import { API_BASE_URL } from "./constants";
-
-// Import routes
 import { changePasswordRouter } from "./routes/change-password";
 import { currentUserRouter } from "./routes/current-user";
 import { forgotPasswordRouter } from "./routes/forgot-password";

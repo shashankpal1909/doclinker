@@ -1,10 +1,9 @@
 import express, { Request, Response } from "express";
+import { body } from "express-validator";
 
 import { BadRequestError } from "../../../common/src";
-
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
-import { body } from "express-validator";
 
 const router = express.Router();
 
@@ -54,7 +53,7 @@ router.post(
     await Token.findByIdAndDelete(existingToken.id);
 
     // Send a success response
-    res.status(200);
+    res.status(200).send();
   }
 );
 

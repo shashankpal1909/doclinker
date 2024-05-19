@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 
 import { BadRequestError } from "../../../common/src";
-
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
 
@@ -18,7 +17,10 @@ router.post("/verify-email/:token", async (req: Request, res: Response) => {
   const token = req.params.token;
 
   // Find the token in the database
-  const existingToken = await Token.findOne({ value: token, type: TokenType.EMAIL_VERIFICATION });
+  const existingToken = await Token.findOne({
+    value: token,
+    type: TokenType.EMAIL_VERIFICATION,
+  });
 
   // If the token is not found, throw an error
   if (!existingToken) {

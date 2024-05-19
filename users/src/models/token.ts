@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import crypto from "crypto";
+import mongoose from "mongoose";
 
 export enum TokenType {
   EMAIL_VERIFICATION = "email-verification",
@@ -7,7 +7,7 @@ export enum TokenType {
 }
 
 // An interface that describes the properties required to create a Token.
-interface TokenAttrs {
+export interface TokenAttrs {
   userId: string;
   type: TokenType;
 }
@@ -18,7 +18,7 @@ interface TokenModel extends mongoose.Model<TokenDoc> {
 }
 
 // An interface that describes the properties a Token Document has.
-interface TokenDoc extends mongoose.Document {
+export interface TokenDoc extends mongoose.Document {
   userId: string;
   value: string;
   type: TokenType;
@@ -31,7 +31,6 @@ const tokenSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
-      unique: true,
     },
     value: {
       type: String,
@@ -54,6 +53,7 @@ const tokenSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: {
       transform(doc, ret) {
         // Rename the _id field to id

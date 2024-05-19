@@ -6,7 +6,6 @@ import {
   NotFoundError,
   requireAuth,
 } from "../../../common/src";
-
 import { User } from "../models/user";
 import { Password } from "../services/password";
 
@@ -53,7 +52,7 @@ router.post(
     await user.save();
 
     // Return a success response
-    res.status(200);
+    res.status(200).send();
   }
 );
 

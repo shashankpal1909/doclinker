@@ -2,12 +2,12 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
 import { BadRequestError, validateRequest } from "../../../common/src";
-
 import { amqpWrapper } from "../amqp-wrapper";
+import { TokenCreatedPublisher } from "../events/publishers/token-created-publisher";
 import { UserCreatedPublisher } from "../events/publishers/user-created-publisher";
+import { Token, TokenType } from "../models/token";
 import { Gender, User, UserRole } from "../models/user";
 import { Mail } from "../services/mail";
-import { Token, TokenType } from "../models/token";
 
 // Create an Express router
 const router = express.Router();
@@ -15,7 +15,7 @@ const router = express.Router();
 /**
  * Route handler for user sign-up.
  * Validates user input, checks for existing users, creates a new user,
- * generates a JSON Web Token (JWT), and publishes a user-created event.
+ * sends an email verification link, and publishes a user-created event.
  */
 router.post(
   "/signup",
@@ -33,7 +33,9 @@ router.post(
       .trim()
       .isIn(Object.values(Gender))
       .withMessage("Invalid Gender"),
-    body("dob").isDate().withMessage("Invalid DOB"),
+    body("dob")
+      .isDate({ format: "yyyy-MM-dd" })
+      .withMessage("DOB must be a valid date in YYYY-MM-DD format"),
     body("fullName").trim().not().isEmpty().withMessage("Invalid Name"),
     body("phoneNumber")
       .optional()
@@ -59,7 +61,7 @@ router.post(
       role,
       fullName,
       phoneNumber,
-      dob,
+      dob: new Date(dob),
       gender,
     });
     await user.save();
@@ -70,9 +72,6 @@ router.post(
       type: TokenType.EMAIL_VERIFICATION,
     });
     await token.save();
-
-    // Send email verification link
-    Mail.sendEmailVerificationLink(user.email, token.value);
 
     // Publish a user-created event
     new UserCreatedPublisher(
@@ -87,6 +86,16 @@ router.post(
       fullName: user.fullName,
       phoneNumber: user.phoneNumber,
       emailVerified: user.emailVerified,
+    });
+
+    // Publish a token-created event
+    new TokenCreatedPublisher(
+      amqpWrapper.connection,
+      amqpWrapper.channel
+    ).publish({
+      email: user.email,
+      type: token.type,
+      token: token.value,
     });
 
     // Send a successful response

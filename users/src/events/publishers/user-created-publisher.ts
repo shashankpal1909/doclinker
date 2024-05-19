@@ -1,5 +1,4 @@
 import { Publisher, Subjects, UserCreatedEvent } from "../../../../common/src";
-
 import { AMQP_EXCHANGE } from "../../constants";
 
 // Publisher for the user created event.

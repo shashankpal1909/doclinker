@@ -1,7 +1,5 @@
 import nodemailer from "nodemailer";
 
-import { API_BASE_URL } from "../constants";
-
 export class Mail {
   private static transporter = nodemailer.createTransport({
     // Set the host and port for the SMTP server
@@ -36,11 +34,22 @@ export class Mail {
     }
   }
 
+  static async sendWelcomeMessage(to: string): Promise<void> {
+    const html = `
+      <h1>Welcome to Doclinker</h1>
+    `;
+
+    // TODO: uncomment this
+
+    // await Mail.sendEmail(to, "Welcome to Doclinker!", html);
+    console.log("email sent: " + html);
+  }
+
   static async sendEmailVerificationLink(
     to: string,
     token: string
   ): Promise<void> {
-    const link: string = `${process.env.BASE_URL}${API_BASE_URL}/verify-email/${token}`;
+    const link: string = `${process.env.BASE_URL}/verify-email/${token}`;
 
     // Create the HTML content for the email
     const html = `
@@ -48,12 +57,14 @@ export class Mail {
       <a href="${link}">${link}</a>
     `;
 
+    // TODO: uncomment this
     // Send the email using the sendEmail function
-    await Mail.sendEmail(to, "Email Verification", html);
+    // await Mail.sendEmail(to, "Email Verification", html);
+    console.log("email sent: " + html);
   }
 
   static async sendPasswordResetLink(to: string, token: string): Promise<void> {
-    const link: string = `${process.env.BASE_URL}${API_BASE_URL}/reset-password/${token}`;
+    const link: string = `${process.env.BASE_URL}/reset-password/${token}`;
 
     // Create the HTML content for the email
     const html = `
@@ -61,7 +72,9 @@ export class Mail {
       <a href="${link}">${link}</a>
     `;
 
+    // TODO: uncomment this
     // Send the email using the sendEmail function
-    await Mail.sendEmail(to, "Email Verification", html);
+    // await Mail.sendEmail(to, "Reset Password", html);
+    console.log("email sent: " + html);
   }
 }

@@ -3,11 +3,12 @@ import { body } from "express-validator";
 import jwt from "jsonwebtoken";
 
 import { BadRequestError, validateRequest } from "../../../common/src";
-
-import { User } from "../models/user";
-import { Password } from "../services/password";
-import { Mail } from "../services/mail";
+import { amqpWrapper } from "../amqp-wrapper";
+import { TokenCreatedPublisher } from "../events/publishers/token-created-publisher";
 import { Token, TokenType } from "../models/token";
+import { User } from "../models/user";
+import { Mail } from "../services/mail";
+import { Password } from "../services/password";
 
 // Create an Express router
 const router = express.Router();
@@ -50,8 +51,15 @@ router.post(
       });
       await token.save();
 
-      // Send email verification link
-      Mail.sendEmailVerificationLink(existingUser.email, token.value);
+      // Publish a token-created event
+      new TokenCreatedPublisher(
+        amqpWrapper.connection,
+        amqpWrapper.channel
+      ).publish({
+        email: existingUser.email,
+        type: token.type,
+        token: token.value,
+      });
 
       throw new BadRequestError("Email not verified");
     }

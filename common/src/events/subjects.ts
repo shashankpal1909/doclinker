@@ -8,4 +8,10 @@ export enum Subjects {
    * @description A user has been created
    */
   UserCreated = "user:created",
+
+  /**
+   * @event token:created
+   * @description A token (email-verification / reset-password) has been created
+   */
+  TokenCreated = "token:created",
 }

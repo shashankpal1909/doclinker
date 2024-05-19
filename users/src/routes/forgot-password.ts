@@ -2,9 +2,10 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
 import { NotFoundError } from "../../../common/src";
-
-import { User } from "../models/user";
+import { amqpWrapper } from "../amqp-wrapper";
+import { TokenCreatedPublisher } from "../events/publishers/token-created-publisher";
 import { Token, TokenType } from "../models/token";
+import { User } from "../models/user";
 import { Mail } from "../services/mail";
 
 // Create an Express router
@@ -39,11 +40,18 @@ router.post(
     // Save the token to the database
     await token.save();
 
-    // Send the password reset link to the user's email
-    Mail.sendPasswordResetLink(user.email, token.value);
+    // Publish a token-created event
+    new TokenCreatedPublisher(
+      amqpWrapper.connection,
+      amqpWrapper.channel
+    ).publish({
+      email: user.email,
+      type: token.type,
+      token: token.value,
+    });
 
     // Return a success response
-    res.status(200);
+    res.status(200).send();
   }
 );
 

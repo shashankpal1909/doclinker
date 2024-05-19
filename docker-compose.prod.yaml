@@ -18,6 +18,13 @@ services:
     volumes:
       - ./.volumes/users-db:/data/db
 
+  mail:
+    build:
+      context: .
+      dockerfile: ./mail/Dockerfile.prod
+    env_file:
+      - ./mail/.env
+
   amqp:
     image: rabbitmq:management
     ports:

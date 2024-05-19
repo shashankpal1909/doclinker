@@ -15,7 +15,7 @@ export enum Gender {
 }
 
 // An interface that describes the properties required to create a User.
-interface UserAttrs {
+export interface UserAttrs {
   email: string;
   password: string;
   dob: Date;
@@ -31,7 +31,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 // An interface that describes the properties a User Document has.
-interface UserDoc extends mongoose.Document {
+export interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
   role: UserRole;
@@ -83,6 +83,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;
