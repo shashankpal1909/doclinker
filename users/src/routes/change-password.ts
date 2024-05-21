@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
-import { body } from "express-validator";
+import {body, validationResult} from "express-validator";
 
 import {
   BadRequestError,
   NotFoundError,
   requireAuth,
+  validateRequest
 } from "../../../common/src";
 import { User } from "../models/user";
 import { Password } from "../services/password";
@@ -30,6 +31,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage("New password must be between 4 and 20 characters"),
   ],
+  validateRequest,
   async (req: Request, res: Response) => {
     const { oldPassword, newPassword } = req.body;
 

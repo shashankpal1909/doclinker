@@ -7,7 +7,6 @@ import { amqpWrapper } from "../amqp-wrapper";
 import { TokenCreatedPublisher } from "../events/publishers/token-created-publisher";
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
-import { Mail } from "../services/mail";
 import { Password } from "../services/password";
 
 // Create an Express router

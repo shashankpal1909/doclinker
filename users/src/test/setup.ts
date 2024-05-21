@@ -5,8 +5,6 @@ import mongoose from "mongoose";
 import { Gender, User, UserDoc, UserRole } from "../models/user";
 
 jest.mock("../amqp-wrapper");
-jest.mock("../services/mail");
-jest.mock("nodemailer");
 
 declare global {
   var signIn: (user?: {
@@ -42,8 +40,8 @@ beforeEach(async () => {
 // Disconnect from the MongoDB memory server after all tests are done
 afterAll(async () => {
   await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
-  await mongo.stop();
+//  await mongoose.connection.close();
+//  await mongo.stop();
 });
 
 global.signIn = async (
@@ -66,7 +64,7 @@ global.signIn = async (
   }
 ) => {
   const dbUser = User.build({ ...user, dob: new Date(user.dob) });
-  dbUser.save();
+  await dbUser.save();
 
   const payload = {
     id: dbUser.id,
@@ -86,5 +84,5 @@ global.signIn = async (
   const base64 = Buffer.from(sessionJSON).toString("base64");
 
   // return a string thats the cookie with the encoded data
-  return { user: dbUser, cookie: [`express:sess=${base64}`] };
+  return { user: dbUser, cookie: [`session=${base64}`] };
 };

@@ -4,7 +4,6 @@ import { app } from "../../app";
 import { API_BASE_URL } from "../../constants";
 import { Token } from "../../models/token";
 import { Gender, User, UserRole } from "../../models/user";
-import { Mail } from "../../services/mail";
 
 it("returns a 200 on successful signin", async () => {
   const password = "password";
@@ -90,11 +89,6 @@ it("returns a 400 when email is not verified", async () => {
 
   await user.save();
 
-  const sendEmailVerificationLinkMock = jest.spyOn(
-    Mail,
-    "sendEmailVerificationLink"
-  );
-
   await request(app)
     .post(`${API_BASE_URL}/signin`)
     .send({
@@ -104,9 +98,7 @@ it("returns a 400 when email is not verified", async () => {
     .expect(400);
 
   const token = await Token.findOne({ userId: user.id });
-
   expect(token).not.toBeNull();
-  expect(sendEmailVerificationLinkMock).toHaveBeenCalled();
 });
 
 it("sets a cookie after successful signin", async () => {

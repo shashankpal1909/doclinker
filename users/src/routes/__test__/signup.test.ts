@@ -5,7 +5,6 @@ import { API_BASE_URL } from "../../constants";
 import { UserCreatedPublisher } from "../../events/publishers/user-created-publisher";
 import { Token } from "../../models/token";
 import { Gender, User, UserRole } from "../../models/user";
-import { Mail } from "../../services/mail";
 
 it("returns a 201 on successful signup", async () => {
   const response = await request(app)
@@ -120,11 +119,6 @@ it("returns a 400 when email is already in use", async () => {
 });
 
 it("creates a token and sends an email verification link on successful signup", async () => {
-  const sendEmailVerificationLinkMock = jest.spyOn(
-    Mail,
-    "sendEmailVerificationLink"
-  );
-
   await request(app)
     .post(`${API_BASE_URL}/signup`)
     .send({
@@ -141,7 +135,6 @@ it("creates a token and sends an email verification link on successful signup", 
   const token = await Token.findOne({ userId: user!.id });
 
   expect(token).not.toBeNull();
-  expect(sendEmailVerificationLinkMock).toHaveBeenCalled();
 });
 
 it("publishes an event on successful signup", async () => {

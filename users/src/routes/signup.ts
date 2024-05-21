@@ -7,7 +7,6 @@ import { TokenCreatedPublisher } from "../events/publishers/token-created-publis
 import { UserCreatedPublisher } from "../events/publishers/user-created-publisher";
 import { Token, TokenType } from "../models/token";
 import { Gender, User, UserRole } from "../models/user";
-import { Mail } from "../services/mail";
 
 // Create an Express router
 const router = express.Router();

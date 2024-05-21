@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { NotFoundError } from "../../../common/src";
+import { NotFoundError, validateRequest } from "../../../common/src";
 import { amqpWrapper } from "../amqp-wrapper";
 import { TokenCreatedPublisher } from "../events/publishers/token-created-publisher";
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
-import { Mail } from "../services/mail";
 
 // Create an Express router
 const router = express.Router();
@@ -19,6 +18,7 @@ const router = express.Router();
 router.post(
   "/forgot-password",
   [body("email").trim().isEmail().withMessage("Invalid Email")],
+  validateRequest,
   async (req: Request, res: Response) => {
     // Extract the email from the request body
     const { email } = req.body;

@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { BadRequestError } from "../../../common/src";
+import { validateRequest, BadRequestError } from "../../../common/src";
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
 
@@ -20,6 +20,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage("Password must be between 4 and 20 characters"),
   ],
+  validateRequest,
   async (req: Request, res: Response) => {
     const token = req.params.token;
     const { password } = req.body;

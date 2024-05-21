@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-// change-password.test.ts
 import request from "supertest";
 
 import { app } from "../../app";
@@ -27,45 +25,35 @@ describe("Change password route tests", () => {
     expect(await Password.compare(updatedUser!.password, newPassword)).toBe(
       true
     );
-  }, 10000);
+  });
 
   it("returns a 400 with a missing old password", async () => {
+    const { user, cookie } = await global.signIn();
+
     const newPassword = "newpassword";
     await request(app)
       .post(`${API_BASE_URL}/change-password`)
+      .set("Cookie", cookie)
       .send({
         newPassword,
       })
       .expect(400);
-  }, 10000);
+  });
 
   it("returns a 400 with an invalid new password", async () => {
-    const oldPassword = "oldpassword";
+    const { cookie } = await global.signIn();
+
+    const oldPassword = "password";
     const newPassword = "123";
     await request(app)
       .post(`${API_BASE_URL}/change-password`)
+      .set("Cookie", cookie)
       .send({
         oldPassword,
         newPassword,
       })
       .expect(400);
-  }, 10000);
-
-  it("returns a 404 if the user is not found", async () => {
-    const oldPassword = "password";
-    const newPassword = "newpassword";
-
-    const { user, cookie } = await global.signIn();
-
-    await request(app)
-      .post(`${API_BASE_URL}/change-password`)
-      .set("Cookie", cookie!)
-      .send({
-        oldPassword,
-        newPassword,
-      })
-      .expect(404);
-  }, 10000);
+  });
 
   it("returns a 400 with invalid login credentials", async () => {
     const wrongOldPassword = "wrongoldpassword";
@@ -81,5 +69,5 @@ describe("Change password route tests", () => {
         newPassword,
       })
       .expect(400);
-  }, 10000);
+  });
 });

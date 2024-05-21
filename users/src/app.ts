@@ -15,13 +15,21 @@ import { signInRouter } from "./routes/signin";
 import { signOutRouter } from "./routes/signout";
 import { signUpRouter } from "./routes/signup";
 import { verifyEmailRouter } from "./routes/verify-email";
+import { logger } from "./logger";
 
 // Initialize the express app
 const app = express();
 
 app.set("trust proxy", true);
 app.use(json());
-app.use(morgan("dev"));
+app.use(
+  morgan("combined", {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+);
+
 app.use(
   cookieSession({
     signed: false,

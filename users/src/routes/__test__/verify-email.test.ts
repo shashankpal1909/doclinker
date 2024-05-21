@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import request from "supertest";
 
-import { app } from "../../app"; // Import your express app
+import { app } from "../../app";
 import { API_BASE_URL } from "../../constants";
 import { Token, TokenType } from "../../models/token";
 import { Gender, User, UserRole } from "../../models/user";
