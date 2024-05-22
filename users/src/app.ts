@@ -37,9 +37,24 @@ app.use(
   })
 );
 
-// Health check route
-app.get(`${API_BASE_URL}/health`, (_req, res) => {
-  res.status(200).send({ message: "Hello World" });
+// Heartbeat route
+app.get(`${API_BASE_URL}/heartbeat`, (req, res) => {
+  function getUptime() {
+    const uptimeSeconds = process.uptime();
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = Math.floor(uptimeSeconds % 60);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  const serverStats = {
+    serviceName: "Users Service",
+    uptime: getUptime(),
+    currentTime: new Date().toISOString(),
+    status: "Ok",
+  };
+
+  res.json(serverStats);
 });
 
 app.use(currentUser);
