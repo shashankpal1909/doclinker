@@ -28,6 +28,15 @@ services:
     depends_on:
       - amqp
 
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile.prod
+    env_file:
+      - ./client/.env
+    ports:
+      - "6666:5173"
+
   amqp:
     image: rabbitmq:management
     ports:

@@ -38,6 +38,17 @@ services:
     volumes:
       - ./.volumes/users-db:/data/db
 
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile.dev
+    env_file:
+      - ./client/.env
+    volumes:
+      - ./client:/app
+    ports:
+      - "6666:6666"
+
   amqp:
     image: rabbitmq:management
     ports:
