@@ -46,6 +46,7 @@ router.post(
       amqpWrapper.channel
     ).publish({
       email: user.email,
+      fullName: user.fullName,
       type: token.type,
       token: token.value,
     });

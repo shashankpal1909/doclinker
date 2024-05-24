@@ -18,10 +18,10 @@ export class TokenCreatedListener extends Listener<TokenCreatedEvent> {
     try {
       switch (data.type) {
         case "email-verification":
-          await Mail.sendEmailVerificationLink(data.email, data.token);
+          await Mail.sendEmailVerificationLink(data.fullName, data.email, data.token);
           break;
         case "reset-password":
-          await Mail.sendPasswordResetLink(data.email, data.token);
+          await Mail.sendPasswordResetLink(data.fullName, data.email, data.token);
           break;
         default:
           break;

@@ -40,8 +40,8 @@ beforeEach(async () => {
 // Disconnect from the MongoDB memory server after all tests are done
 afterAll(async () => {
   await mongoose.connection.dropDatabase();
-//  await mongoose.connection.close();
-//  await mongo.stop();
+  await mongoose.connection.close();
+  await mongo.stop();
 });
 
 global.signIn = async (

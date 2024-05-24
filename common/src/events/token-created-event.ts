@@ -14,6 +14,7 @@ export interface TokenCreatedEvent {
   // The data to publish with the event.
   data: {
     email: string;
+    fullName: string;
     type: "email-verification" | "reset-password";
     token: string;
   };
