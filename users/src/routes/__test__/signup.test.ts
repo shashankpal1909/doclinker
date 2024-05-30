@@ -15,7 +15,7 @@ it("returns a 201 on successful signup", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(201);
 
@@ -33,7 +33,7 @@ it("returns 400 if email is already in use", async () => {
       role: "patient",
       dob: "2002-09-19",
       gender: "male",
-      fullName: "Test User",
+      name: "Test User",
       phoneNumber: "1234567890",
     })
     .expect(201);
@@ -46,7 +46,7 @@ it("returns 400 if email is already in use", async () => {
       role: "patient",
       dob: "2000-01-01",
       gender: "male",
-      fullName: "Test User",
+      name: "Test User",
       phoneNumber: "1234567890",
     })
     .expect(400);
@@ -61,7 +61,7 @@ it("returns a 400 with an invalid email", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(400);
 });
@@ -75,7 +75,7 @@ it("returns a 400 with an invalid password", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(400);
 });
@@ -88,7 +88,7 @@ it("returns a 400 with a missing required field", async () => {
       password: "password",
       role: "patient",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(400);
 });
@@ -98,7 +98,7 @@ it("returns a 400 when email is already in use", async () => {
     email: "test@test.com",
     password: "password",
     role: UserRole.PATIENT,
-    fullName: "Existing User",
+    name: "Existing User",
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     phoneNumber: null,
@@ -113,7 +113,7 @@ it("returns a 400 when email is already in use", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(400);
 });
@@ -127,7 +127,7 @@ it("creates a token and sends an email verification link on successful signup", 
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(201);
 
@@ -148,7 +148,7 @@ it("publishes an event on successful signup", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(201);
 

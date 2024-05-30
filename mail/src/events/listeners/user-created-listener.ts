@@ -13,7 +13,7 @@ export class UserCreatedListener extends Listener<UserCreatedEvent> {
 
   async onMessage(data: UserCreatedEvent["data"], msg: Message): Promise<void> {
     try {
-      await Mail.sendWelcomeMessage(data.fullName, data.role, data.email);
+      await Mail.sendWelcomeMessage(data.name, data.role, data.email);
       this.channel.ack(msg);
     } catch (error) {
       console.error(error);

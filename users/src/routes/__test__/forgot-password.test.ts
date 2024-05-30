@@ -12,7 +12,7 @@ it("returns a 200 on successful request", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test User",
+    name: "Test User",
     phoneNumber: null,
   });
 
@@ -69,7 +69,7 @@ it("publishes an event on successful token creation", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test User",
+    name: "Test User",
     phoneNumber: null,
   });
 

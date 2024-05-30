@@ -21,7 +21,7 @@ export interface UserAttrs {
   dob: Date;
   gender: Gender;
   role: UserRole;
-  fullName: string;
+  name: string;
   phoneNumber: string | null;
 }
 
@@ -37,7 +37,7 @@ export interface UserDoc extends mongoose.Document {
   role: UserRole;
   dob: Date;
   gender: Gender;
-  fullName: string;
+  name: string;
   phoneNumber: string | null;
   emailVerified: Date | null;
 }
@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    fullName: {
+    name: {
       type: String,
       required: true,
     },

@@ -13,7 +13,7 @@ declare global {
     dob: string;
     gender: Gender;
     role: UserRole;
-    fullName: string;
+    name: string;
     phoneNumber: string | null;
   }) => Promise<{ user: UserDoc; cookie: string[] }>;
 }
@@ -51,7 +51,7 @@ global.signIn = async (
     dob: string;
     gender: Gender;
     role: UserRole;
-    fullName: string;
+    name: string;
     phoneNumber: string | null;
   } = {
     email: "test@test.com",
@@ -59,7 +59,7 @@ global.signIn = async (
     dob: "2000-01-01",
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: "555-555-5555",
   }
 ) => {

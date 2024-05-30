@@ -18,7 +18,7 @@ export interface UserCreatedEvent {
     role: "doctor" | "patient" | "admin";
     dob: Date;
     gender: "male" | "female" | "other";
-    fullName: string;
+    name: string;
     phoneNumber: string | null;
     emailVerified: Date | null;
   };

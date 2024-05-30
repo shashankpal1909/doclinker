@@ -11,7 +11,7 @@ it("clears the cookie after signing out", async () => {
       role: "patient",
       gender: "male",
       dob: "2000-01-01",
-      fullName: "Test User",
+      name: "Test User",
     })
     .expect(201);
 

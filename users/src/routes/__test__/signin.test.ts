@@ -13,7 +13,7 @@ it("returns a 200 on successful signin", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: null,
   });
 
@@ -59,7 +59,7 @@ it("returns a 400 with invalid login credentials", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: null,
   });
 
@@ -83,7 +83,7 @@ it("returns a 400 when email is not verified", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: null,
   });
 
@@ -109,7 +109,7 @@ it("sets a cookie after successful signin", async () => {
     dob: new Date("2000-01-01"),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: null,
   });
 

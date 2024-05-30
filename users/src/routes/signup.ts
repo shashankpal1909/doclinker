@@ -35,7 +35,7 @@ router.post(
     body("dob")
       .isDate({ format: "yyyy-MM-dd" })
       .withMessage("DOB must be a valid date in YYYY-MM-DD format"),
-    body("fullName").trim().not().isEmpty().withMessage("Invalid Name"),
+    body("name").trim().not().isEmpty().withMessage("Invalid Name"),
     body("phoneNumber")
       .optional()
       .trim()
@@ -44,8 +44,7 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password, role, dob, gender, fullName, phoneNumber } =
-      req.body;
+    const { email, password, role, dob, gender, name, phoneNumber } = req.body;
 
     // Check if email is already in use
     let existingUser = await User.findOne({ email });
@@ -58,7 +57,7 @@ router.post(
       email,
       password,
       role,
-      fullName,
+      name: name,
       phoneNumber,
       dob: new Date(dob),
       gender,
@@ -82,7 +81,7 @@ router.post(
       role: user.role,
       dob: user.dob,
       gender: user.gender,
-      fullName: user.fullName,
+      name: user.name,
       phoneNumber: user.phoneNumber,
       emailVerified: user.emailVerified,
     });
@@ -93,7 +92,7 @@ router.post(
       amqpWrapper.channel
     ).publish({
       email: user.email,
-      fullName: user.fullName,
+      name: user.name,
       type: token.type,
       token: token.value,
     });

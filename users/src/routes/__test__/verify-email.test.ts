@@ -14,7 +14,7 @@ it("should verify the user's email with a valid token", async () => {
     dob: new Date(),
     gender: Gender.MALE,
     role: UserRole.PATIENT,
-    fullName: "Test",
+    name: "Test",
     phoneNumber: "555-555-5555",
   });
   await user.save();
