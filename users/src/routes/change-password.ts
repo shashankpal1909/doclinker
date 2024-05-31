@@ -1,12 +1,7 @@
 import express, { Request, Response } from "express";
-import {body, validationResult} from "express-validator";
+import { body } from "express-validator";
 
-import {
-  BadRequestError,
-  NotFoundError,
-  requireAuth,
-  validateRequest
-} from "../../../common/src";
+import { BadRequestError, NotFoundError, requireAuth, validateRequest } from "../../../common/src";
 import { User } from "../models/user";
 import { Password } from "../services/password";
 

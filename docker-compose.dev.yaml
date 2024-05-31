@@ -47,7 +47,7 @@ services:
     volumes:
       - ./client:/app
     ports:
-      - "6666:6666"
+      - "8080:8080"
 
   amqp:
     image: rabbitmq:management
@@ -57,7 +57,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=doclinker
       - RABBITMQ_DEFAULT_PASS=doclinker
-  
+
   nginx:
     build:
       context: .

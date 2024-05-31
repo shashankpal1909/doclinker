@@ -1,9 +1,10 @@
 import request from "supertest";
+
 import { app } from "../../app";
-import { Gender, User, UserRole } from "../../models/user";
-import { Token, TokenType } from "../../models/token";
-import { TokenCreatedPublisher } from "../../events/publishers/token-created-publisher";
 import { API_BASE_URL } from "../../constants";
+import { TokenCreatedPublisher } from "../../events/publishers/token-created-publisher";
+import { Token, TokenType } from "../../models/token";
+import { Gender, User, UserRole } from "../../models/user";
 
 it("returns a 200 on successful request", async () => {
   const user = User.build({

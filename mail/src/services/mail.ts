@@ -1,4 +1,5 @@
 import nodemailer, { SentMessageInfo } from "nodemailer";
+
 import { logger } from "../logger";
 
 export class Mail {

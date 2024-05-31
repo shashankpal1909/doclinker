@@ -1,11 +1,12 @@
+import "./index.css";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import Footer from "./components/footer.tsx";
 import Header from "./components/header.tsx";
 import { ThemeProvider } from "./components/theme-provider.tsx";
-import "./index.css";
 import LandingPage from "./pages/landing-page.tsx";
 import SignInPage from "./pages/signin-page.tsx";
 import SignUpPage from "./pages/signup-page.tsx";

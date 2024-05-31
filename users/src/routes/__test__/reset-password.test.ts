@@ -1,9 +1,9 @@
 import request from "supertest";
+
 import { app } from "../../app";
-import { Gender, User, UserRole } from "../../models/user";
-import { Token, TokenType } from "../../models/token";
-import { TokenCreatedPublisher } from "../../events/publishers/token-created-publisher";
 import { API_BASE_URL } from "../../constants";
+import { Token, TokenType } from "../../models/token";
+import { Gender, User, UserRole } from "../../models/user";
 import { Password } from "../../services/password";
 
 it("returns a 200 on successful password reset", async () => {

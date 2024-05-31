@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { validateRequest, BadRequestError } from "../../../common/src";
+import { BadRequestError, validateRequest } from "../../../common/src";
 import { Token, TokenType } from "../models/token";
 import { User } from "../models/user";
 

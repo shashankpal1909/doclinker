@@ -7,6 +7,7 @@ import morgan from "morgan";
 
 import { currentUser, errorHandler, NotFoundError } from "../../common/src";
 import { API_BASE_URL } from "./constants";
+import { logger } from "./logger";
 import { changePasswordRouter } from "./routes/change-password";
 import { currentUserRouter } from "./routes/current-user";
 import { forgotPasswordRouter } from "./routes/forgot-password";
@@ -15,7 +16,6 @@ import { signInRouter } from "./routes/signin";
 import { signOutRouter } from "./routes/signout";
 import { signUpRouter } from "./routes/signup";
 import { verifyEmailRouter } from "./routes/verify-email";
-import { logger } from "./logger";
 
 // Initialize the express app
 const app = express();
