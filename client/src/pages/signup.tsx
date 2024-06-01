@@ -1,13 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { startTransition, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdError, MdVerified } from "react-icons/md";
-import { Link, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
-import authService from "@/api/services/auth-service";
+import { AppDispatch, RootState } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -52,6 +53,8 @@ import {
 
 import InfoComponent from "@/components/info";
 
+import { signUp } from "@/features/auth/authSlice";
+
 import { cn } from "@/lib/utils";
 
 const SignUpSchema = z.object({
@@ -73,12 +76,16 @@ const SignUpSchema = z.object({
 });
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loading, user, error, success } = useSelector(
+    (state: RootState) => state.authReducer,
+  );
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [role, setRole] = useState<string>("patient");
-
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
-  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
@@ -89,34 +96,22 @@ const SignUpPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (user) {
+      setSearchParams({});
+      navigate("/dashboard");
+    }
+  }, [navigate, searchParams, setSearchParams, user]);
+
   const onSubmit = (values: z.infer<typeof SignUpSchema>) => {
-    setError("");
-    setSuccess("");
-
     startTransition(() => {
-      authService
-        .signUp({
-          ...values,
-          role,
-          dob: values.dob.toISOString().split("T")[0],
-        })
-        .then(() => {
-          setSuccess(
-            "Verification email has been sent! Please verify your email.",
-          );
-        })
-        .catch((error) => {
-          type ApiError = {
-            message: string;
-            field?: string;
-          };
+      const dto = {
+        ...values,
+        role,
+        dob: values.dob.toISOString().split("T")[0],
+      };
 
-          setError(
-            (error.response.data.errors as ApiError[])
-              .map((err: ApiError) => err.message)
-              .join("\n"),
-          );
-        });
+      dispatch(signUp(dto));
     });
   };
 
@@ -186,7 +181,7 @@ const SignUpPage = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={loading}
                           placeholder="John Doe"
                         />
                       </FormControl>
@@ -203,7 +198,7 @@ const SignUpPage = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={loading}
                           placeholder="john.doe@example.com"
                           type="email"
                         />
@@ -221,7 +216,7 @@ const SignUpPage = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={loading}
                           placeholder="******"
                           type="password"
                         />
@@ -260,7 +255,9 @@ const SignUpPage = () => {
                             selected={field.value}
                             onSelect={field.onChange}
                             disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
+                              loading ||
+                              date > new Date() ||
+                              date < new Date("1900-01-01")
                             }
                             fromYear={1960}
                             toYear={new Date().getFullYear()}
@@ -282,7 +279,7 @@ const SignUpPage = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger disabled={loading}>
                             <SelectValue placeholder="Select your gender" />
                           </SelectTrigger>
                         </FormControl>
@@ -313,7 +310,8 @@ const SignUpPage = () => {
                   Icon={MdVerified}
                 />
               )}
-              <Button disabled={isPending} type="submit" className="w-full">
+              <Button disabled={loading} type="submit" className="w-full">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Continue
               </Button>
             </form>

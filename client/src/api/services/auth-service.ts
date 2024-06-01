@@ -1,5 +1,12 @@
 import apiClient from "@/api/client";
 
+import {
+  ForgotPasswordDTO,
+  ResetPasswordDTO,
+  SignInDTO,
+  SignUpDTO,
+} from "@/lib/dtos";
+
 interface User {
   id: string;
   email: string;
@@ -7,28 +14,6 @@ interface User {
   role: string;
   gender: string;
   dob: string;
-}
-
-interface SignInDTO {
-  email: string;
-  password: string;
-}
-
-interface SignUpDTO {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  gender: string;
-  dob: string;
-}
-
-interface ForgotPasswordDTO {
-  email: string;
-}
-
-interface ResetPasswordDTO {
-  password: string;
 }
 
 class AuthService {
@@ -40,6 +25,18 @@ class AuthService {
   async signUp(dto: SignUpDTO): Promise<void> {
     const response = await apiClient.post("/users/signup", dto);
     return response.data;
+  }
+
+  async signOut(): Promise<void> {
+    const response = await apiClient.post("/users/signout");
+    return response.data;
+  }
+
+  async getCurrentUser(): Promise<User | null> {
+    const response = await apiClient.get<{ currentUser: User | null }>(
+      "/users/currentuser",
+    );
+    return response.data.currentUser;
   }
 
   async verifyEmail(token: string): Promise<void> {

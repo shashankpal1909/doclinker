@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import { store } from "@/app/store";
@@ -19,7 +19,16 @@ import VerifyEmailPage from "@/pages/verify-email";
 
 import "@/index.css";
 
+import RequireAuth from "./components/require-auth";
+import { getCurrentUser } from "./features/auth/authSlice";
+
 const Layout = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
+  }, [dispatch]);
+
   return (
     <div className="flex flex-col flex-grow h-screen">
       <Header />
@@ -62,7 +71,19 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <DashboardPage />,
+        element: (
+          <RequireAuth>
+            <DashboardPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "protected",
+        element: (
+          <RequireAuth>
+            <h1>Protected Page</h1>
+          </RequireAuth>
+        ),
       },
       {
         path: "*",

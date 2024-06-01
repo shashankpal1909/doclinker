@@ -1,11 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { Loader2 } from "lucide-react";
+import { startTransition, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { MdError, MdVerified } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
-import authService from "@/api/services/auth-service";
+import { AppDispatch, RootState } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +30,8 @@ import { Input } from "@/components/ui/input";
 
 import InfoComponent from "@/components/info";
 
+import { signIn } from "@/features/auth/authSlice";
+
 const SignInSchema = z.object({
   email: z.string().email({
     message: "Email is required",
@@ -39,10 +43,15 @@ const SignInSchema = z.object({
 
 const SignInPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
-  const [isPending, startTransition] = useTransition();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loading, user, error, success } = useSelector(
+    (state: RootState) => state.authReducer,
+  );
+
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
@@ -52,28 +61,19 @@ const SignInPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [from, navigate, user]);
+
   const onSubmit = (values: z.infer<typeof SignInSchema>) => {
-    setError("");
-    setSuccess("");
-
     startTransition(() => {
-      authService
-        .signIn(values)
-        .then(() => {
-          navigate(`/dashboard`, { replace: true });
-        })
-        .catch((error) => {
-          type ApiError = {
-            message: string;
-            field?: string;
-          };
-
-          setError(
-            (error.response.data.errors as ApiError[])
-              .map((err: ApiError) => err.message)
-              .join("\n"),
-          );
-        });
+      const dto = values;
+      dispatch(signIn(dto))
+        .unwrap()
+        .then(() => navigate(from, { replace: true }))
+        .catch(() => {});
     });
   };
 
@@ -102,7 +102,7 @@ const SignInPage = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={loading}
                           placeholder="john.doe@example.com"
                           type="email"
                         />
@@ -128,7 +128,7 @@ const SignInPage = () => {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={loading}
                           placeholder="******"
                           type="password"
                         />
@@ -154,7 +154,8 @@ const SignInPage = () => {
                   Icon={MdVerified}
                 />
               )}
-              <Button disabled={isPending} type="submit" className="w-full">
+              <Button disabled={loading} type="submit" className="w-full">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Continue
               </Button>
             </form>
