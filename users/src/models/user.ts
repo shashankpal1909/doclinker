@@ -90,6 +90,9 @@ const userSchema = new mongoose.Schema(
 
         delete ret._id;
         delete ret.password;
+        delete ret.emailVerified;
+        delete ret.createdAt;
+        delete ret.updatedAt;
         delete ret.__v;
       },
     },

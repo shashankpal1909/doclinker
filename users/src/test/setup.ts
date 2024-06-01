@@ -69,6 +69,10 @@ global.signIn = async (
   const payload = {
     id: dbUser.id,
     email: dbUser.email,
+    name: dbUser.name,
+    role: dbUser.role,
+    gender: dbUser.gender,
+    dob: dbUser.dob,
   };
 
   // Create the JWT!

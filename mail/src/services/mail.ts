@@ -32,7 +32,7 @@ export class Mail {
         html,
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 

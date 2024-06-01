@@ -49,7 +49,7 @@ const tokenSchema = new mongoose.Schema(
       required: true,
       // Set the default expiration time to 15 minutes from now
       default: new Date(),
-      expires: 15 * 60,
+      expires: 900,
     },
   },
   {

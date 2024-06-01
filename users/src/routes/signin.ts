@@ -66,7 +66,14 @@ router.post(
 
     // Generate a JWT (JSON Web Token)
     const userJWT = jwt.sign(
-      { id: existingUser._id, email: existingUser.email },
+      {
+        id: existingUser._id,
+        email: existingUser.email,
+        name: existingUser.name,
+        role: existingUser.role,
+        gender: existingUser.gender,
+        dob: existingUser.dob,
+      },
       process.env.JWT_KEY!
     );
 

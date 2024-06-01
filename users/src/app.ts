@@ -2,6 +2,7 @@ import "express-async-errors";
 
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
+import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 
@@ -20,7 +21,14 @@ import { verifyEmailRouter } from "./routes/verify-email";
 // Initialize the express app
 const app = express();
 
+// Setup CORS
+const corsOptions = {
+  origin: process.env.CLIENT_BASE_URL || "http://localhost:8080",
+  credentials: true,
+};
+
 app.set("trust proxy", true);
+app.use(cors(corsOptions));
 app.use(json());
 app.use(
   morgan("combined", {
