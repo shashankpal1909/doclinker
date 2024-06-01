@@ -94,16 +94,10 @@ export const signOut = createAsyncThunk("auth/signOut", async (_, thunkAPI) => {
   }
 });
 
-// Similar thunks for other actions (verifyEmail, forgotPassword, resetPassword, changePassword, logout)...
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    logout(state) {
-      state.user = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getCurrentUser.pending, (state) => {
@@ -173,7 +167,5 @@ const authSlice = createSlice({
       });
   },
 });
-
-export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;

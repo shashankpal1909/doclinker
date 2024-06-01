@@ -98,10 +98,9 @@ const SignUpPage = () => {
 
   useEffect(() => {
     if (user) {
-      setSearchParams({});
       navigate("/dashboard");
     }
-  }, [navigate, searchParams, setSearchParams, user]);
+  }, [navigate, user]);
 
   const onSubmit = (values: z.infer<typeof SignUpSchema>) => {
     startTransition(() => {
@@ -127,7 +126,12 @@ const SignUpPage = () => {
     } else {
       setSearchParams({ role: "patient" });
     }
-  }, [role, setSearchParams]);
+
+    return () => {
+      searchParams.delete("role");
+      setSearchParams(searchParams);
+    };
+  }, [role, searchParams, setSearchParams]);
 
   return (
     <div className="container flex justify-center items-center my-8">
