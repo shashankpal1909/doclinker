@@ -1,15 +1,17 @@
-import apiClient from "../client";
-
-interface Credentials {
-  email: string;
-  password: string;
-}
+import apiClient from "@/api/client";
 
 interface User {
   id: string;
-  name: string;
   email: string;
-  // Add other fields as necessary
+  name: string;
+  role: string;
+  gender: string;
+  dob: string;
+}
+
+interface SignInDTO {
+  email: string;
+  password: string;
 }
 
 interface SignUpDTO {
@@ -21,26 +23,42 @@ interface SignUpDTO {
   dob: string;
 }
 
+interface ForgotPasswordDTO {
+  email: string;
+}
+
+interface ResetPasswordDTO {
+  password: string;
+}
+
 class AuthService {
-  async signIn(credentials: Credentials): Promise<User> {
-    try {
-      const response = await apiClient.post<User>("/users/signin", credentials, {});
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async signIn(dto: SignInDTO): Promise<User> {
+    const response = await apiClient.post<User>("/users/signin", dto);
+    return response.data;
   }
 
-  async signUp(userData: SignUpDTO): Promise<User> {
-    try {
-      const response = await apiClient.post<User>("/users/signup", userData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+  async signUp(dto: SignUpDTO): Promise<void> {
+    const response = await apiClient.post("/users/signup", dto);
+    return response.data;
   }
 
-  // Add more auth-related API methods here
+  async verifyEmail(token: string): Promise<void> {
+    const response = await apiClient.post(`/users/verify-email/${token}`);
+    return response.data;
+  }
+
+  async forgotPassword(dto: ForgotPasswordDTO): Promise<void> {
+    const response = await apiClient.post(`/users/forgot-password`, dto);
+    return response.data;
+  }
+
+  async resetPassword(token: string, dto: ResetPasswordDTO): Promise<void> {
+    const response = await apiClient.post(
+      `/users/reset-password/${token}`,
+      dto,
+    );
+    return response.data;
+  }
 }
 
 export default new AuthService();

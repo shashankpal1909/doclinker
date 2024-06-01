@@ -1,13 +1,12 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL:
-    import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:8888/api/v1",
+  baseURL: import.meta.env.API_BASE_URL || "http://localhost:8888/api/v1",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(

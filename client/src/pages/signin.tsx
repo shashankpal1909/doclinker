@@ -1,15 +1,32 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { MdError, MdVerified } from "react-icons/md";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
+import authService from "@/api/services/auth-service";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    Form, FormControl, FormField, FormItem, FormLabel, FormMessage
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+import InfoComponent from "@/components/info";
 
 const SignInSchema = z.object({
   email: z.string().email({
@@ -20,9 +37,9 @@ const SignInSchema = z.object({
   }),
 });
 
-type Props = {};
+const SignInPage = () => {
+  const navigate = useNavigate();
 
-const SignInPage = (props: Props) => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -39,9 +56,25 @@ const SignInPage = (props: Props) => {
     setError("");
     setSuccess("");
 
-    console.log(values);
+    startTransition(() => {
+      authService
+        .signIn(values)
+        .then(() => {
+          navigate(`/dashboard`, { replace: true });
+        })
+        .catch((error) => {
+          type ApiError = {
+            message: string;
+            field?: string;
+          };
 
-    startTransition(() => {});
+          setError(
+            (error.response.data.errors as ApiError[])
+              .map((err: ApiError) => err.message)
+              .join("\n"),
+          );
+        });
+    });
   };
 
   return (
@@ -49,6 +82,9 @@ const SignInPage = (props: Props) => {
       <Card className="w-full max-w-[600px] mx-4">
         <CardHeader>
           <CardTitle className="text-3xl">Sign In</CardTitle>
+          <CardDescription>
+            Welcome back! Please enter your details.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -80,7 +116,15 @@ const SignInPage = (props: Props) => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="flex justify-between">
+                        Password
+                        <Link
+                          to="/forgot-password"
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -94,24 +138,22 @@ const SignInPage = (props: Props) => {
                   )}
                 />
               </div>
-              {
-                error && error
-                // <InfoComponent
-                //   variant={"error"}
-                //   title={"Error"}
-                //   description={error}
-                //   Icon={MdError}
-                // />
-              }
-              {
-                success && success
-                // <InfoComponent
-                //   variant={"success"}
-                //   title={"Success"}
-                //   description={success}
-                //   Icon={MdVerified}
-                // />
-              }
+              {error && (
+                <InfoComponent
+                  variant={"error"}
+                  title={"Error"}
+                  description={error}
+                  Icon={MdError}
+                />
+              )}
+              {success && (
+                <InfoComponent
+                  variant={"success"}
+                  title={"Success"}
+                  description={success}
+                  Icon={MdVerified}
+                />
+              )}
               <Button disabled={isPending} type="submit" className="w-full">
                 Continue
               </Button>

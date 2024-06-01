@@ -1,28 +1,58 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { MdError, MdVerified } from "react-icons/md";
 import { Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
 import authService from "@/api/services/auth-service";
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup,
-    DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    Form, FormControl, FormField, FormItem, FormLabel, FormMessage
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+
+import InfoComponent from "@/components/info";
+
 import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const SignUpSchema = z.object({
   email: z.string().email({
@@ -42,9 +72,7 @@ const SignUpSchema = z.object({
   }),
 });
 
-type Props = {};
-
-const SignUpPage = (props: Props) => {
+const SignUpPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [role, setRole] = useState<string>("patient");
 
@@ -65,8 +93,6 @@ const SignUpPage = (props: Props) => {
     setError("");
     setSuccess("");
 
-    console.log(values);
-
     startTransition(() => {
       authService
         .signUp({
@@ -74,13 +100,22 @@ const SignUpPage = (props: Props) => {
           role,
           dob: values.dob.toISOString().split("T")[0],
         })
-        .then((res) => {
-          console.log(res);
-          setSuccess("Account created successfully!");
+        .then(() => {
+          setSuccess(
+            "Verification email has been sent! Please verify your email.",
+          );
         })
-        .catch((err) => {
-          console.log(err);
-          setError(err.message);
+        .catch((error) => {
+          type ApiError = {
+            message: string;
+            field?: string;
+          };
+
+          setError(
+            (error.response.data.errors as ApiError[])
+              .map((err: ApiError) => err.message)
+              .join("\n"),
+          );
         });
     });
   };
@@ -89,7 +124,7 @@ const SignUpPage = (props: Props) => {
     if (searchParams.get("role") === "doctor") {
       setRole("doctor");
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (role === "doctor") {
@@ -97,7 +132,7 @@ const SignUpPage = (props: Props) => {
     } else {
       setSearchParams({ role: "patient" });
     }
-  }, [role]);
+  }, [role, setSearchParams]);
 
   return (
     <div className="container flex justify-center items-center my-8">
@@ -129,6 +164,11 @@ const SignUpPage = (props: Props) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </CardTitle>
+          <CardDescription>
+            {role === "doctor"
+              ? "Create your account to start connecting with patients."
+              : "Create your account to easily schedule appointments with doctors."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -257,8 +297,22 @@ const SignUpPage = (props: Props) => {
                   )}
                 />
               </div>
-              {error && <div className="text-red-500">{error}</div>}
-              {success && <div className="text-green-500">{success}</div>}
+              {error && (
+                <InfoComponent
+                  variant={"error"}
+                  title={"Error"}
+                  description={error}
+                  Icon={MdError}
+                />
+              )}
+              {success && (
+                <InfoComponent
+                  variant={"success"}
+                  title={"Success"}
+                  description={success}
+                  Icon={MdVerified}
+                />
+              )}
               <Button disabled={isPending} type="submit" className="w-full">
                 Continue
               </Button>
