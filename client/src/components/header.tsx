@@ -1,17 +1,19 @@
+import { LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { AppDispatch, RootState } from "@/app/store";
+import { AppDispatch } from "@/app/store";
 
 import ModeToggle from "@/components/mode-toggle";
 
-import { signOut } from "@/features/auth/authSlice";
+import { userReducer } from "@/features/auth/slice";
+import { signOut } from "@/features/auth/thunks";
 
 import { Button } from "./ui/button";
 
 const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.authReducer);
+  const user = useSelector(userReducer);
 
   return (
     <header className="bg-opacity-20 backdrop-filter backdrop-blur-lg border-b border-gray-300 dark:border-gray-700">
@@ -30,7 +32,7 @@ const Header = () => {
                 dispatch(signOut());
               }}
             >
-              L
+              <LogOut className="h-[1.2rem] w-[1.2rem]" />
             </Button>
           )}
           <ModeToggle />

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MdError, MdVerified } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 
-import authService from "@/api/services/auth-service";
+import { AppDispatch } from "@/app/store";
 
 import {
   Card,
@@ -16,33 +17,28 @@ import {
 import InfoComponent from "@/components/info";
 import LoadingComponent from "@/components/loading";
 
+import {
+  resetVerifyEmailState,
+  verifyEmailReducer,
+} from "@/features/auth/slice";
+import { verifyEmail } from "@/features/auth/thunks";
+
 const VerifyEmailPage = () => {
   const { token } = useParams();
 
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loading, error, success } = useSelector(verifyEmailReducer);
 
   useEffect(() => {
-    setError("");
-    setSuccess("");
+    dispatch(verifyEmail(token!));
+  }, [dispatch, token]);
 
-    if (token) {
-      authService
-        .verifyEmail(token)
-        .then(() => {
-          setSuccess("Email verified successfully!");
-        })
-        .catch((error) => {
-          setError(
-            error.response.data.errors.map(
-              (err: { message: string; field?: string }) => err.message,
-            ),
-          );
-        });
-    } else {
-      setError("Invalid/Expired token");
-    }
-  }, [token]);
+  useEffect(() => {
+    return () => {
+      dispatch(resetVerifyEmailState());
+    };
+  }, []);
 
   return (
     <div className="container flex justify-center items-center my-8">
@@ -54,7 +50,7 @@ const VerifyEmailPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!success && !error && <LoadingComponent />}
+          {(loading || (!success && !error)) && <LoadingComponent />}
           {error && (
             <InfoComponent
               variant={"error"}

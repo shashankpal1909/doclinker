@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
-import { AppDispatch, RootState } from "@/app/store";
+import { AppDispatch } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -53,7 +53,12 @@ import {
 
 import InfoComponent from "@/components/info";
 
-import { signUp } from "@/features/auth/authSlice";
+import {
+  resetSignUpState,
+  signUpReducer,
+  userReducer,
+} from "@/features/auth/slice";
+import { signUp } from "@/features/auth/thunks";
 
 import { cn } from "@/lib/utils";
 
@@ -80,9 +85,8 @@ const SignUpPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { loading, user, error, success } = useSelector(
-    (state: RootState) => state.authReducer,
-  );
+  const user = useSelector(userReducer);
+  const { loading, error, success } = useSelector(signUpReducer);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [role, setRole] = useState<string>("patient");
@@ -93,6 +97,8 @@ const SignUpPage = () => {
       email: "",
       password: "",
       name: "",
+      dob: undefined,
+      gender: undefined,
     },
   });
 
@@ -102,6 +108,12 @@ const SignUpPage = () => {
     }
   }, [navigate, user]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetSignUpState());
+    };
+  }, []);
+
   const onSubmit = (values: z.infer<typeof SignUpSchema>) => {
     startTransition(() => {
       const dto = {
@@ -110,7 +122,14 @@ const SignUpPage = () => {
         dob: values.dob.toISOString().split("T")[0],
       };
 
-      dispatch(signUp(dto));
+      dispatch(signUp(dto))
+        .unwrap()
+        .then(() => {
+          form.reset();
+        })
+        .catch(() => {
+          form.resetField("password");
+        });
     });
   };
 
@@ -280,7 +299,7 @@ const SignUpPage = () => {
                       <FormLabel>Gender</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value || ""}
                       >
                         <FormControl>
                           <SelectTrigger disabled={loading}>

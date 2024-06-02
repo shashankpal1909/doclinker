@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
-import { AppDispatch, RootState } from "@/app/store";
+import { AppDispatch } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,12 @@ import { Input } from "@/components/ui/input";
 
 import InfoComponent from "@/components/info";
 
-import { signIn } from "@/features/auth/authSlice";
+import {
+  resetSignInState,
+  signInReducer,
+  userReducer,
+} from "@/features/auth/slice";
+import { signIn } from "@/features/auth/thunks";
 
 const SignInSchema = z.object({
   email: z.string().email({
@@ -47,9 +52,8 @@ const SignInPage = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { loading, user, error, success } = useSelector(
-    (state: RootState) => state.authReducer,
-  );
+  const user = useSelector(userReducer);
+  const { loading, error, success } = useSelector(signInReducer);
 
   const from = location.state?.from?.pathname || "/dashboard";
 
@@ -66,6 +70,12 @@ const SignInPage = () => {
       navigate(from, { replace: true });
     }
   }, [from, navigate, user]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetSignInState());
+    };
+  }, []);
 
   const onSubmit = (values: z.infer<typeof SignInSchema>) => {
     startTransition(() => {

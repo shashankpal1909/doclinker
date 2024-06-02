@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { startTransition, useState } from "react";
+import { startTransition, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { MdError, MdVerified } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
-import authService from "@/api/services/auth-service";
+import { AppDispatch } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,12 @@ import { Input } from "@/components/ui/input";
 
 import InfoComponent from "@/components/info";
 
+import {
+  forgotPasswordReducer,
+  resetForgotPasswordState,
+} from "@/features/auth/slice";
+import { forgotPassword } from "@/features/auth/thunks";
+
 const ForgotPasswordSchema = z.object({
   email: z.string().email({
     message: "Email is required",
@@ -36,9 +43,9 @@ const ForgotPasswordSchema = z.object({
 });
 
 const ForgotPasswordPage = () => {
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loading, error, success } = useSelector(forgotPasswordReducer);
 
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
@@ -47,29 +54,16 @@ const ForgotPasswordPage = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof ForgotPasswordSchema>) => {
-    setError("");
-    setSuccess("");
-    setLoading(true);
+  useEffect(() => {
+    return () => {
+      dispatch(resetForgotPasswordState());
+    };
+  }, []);
 
+  const onSubmit = (values: z.infer<typeof ForgotPasswordSchema>) => {
     startTransition(() => {
-      authService
-        .forgotPassword(values)
-        .then(() => {
-          setSuccess("Check you email for reset password instructions.");
-        })
-        .catch((error) => {
-          type ApiError = {
-            message: string;
-            field?: string;
-          };
-          setError(
-            (error.response.data.errors as ApiError[])
-              .map((err: ApiError) => err.message)
-              .join("\n"),
-          );
-        })
-        .finally(() => setLoading(false));
+      const dto = values;
+      dispatch(forgotPassword(dto));
     });
   };
 

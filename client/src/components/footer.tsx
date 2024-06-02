@@ -1,6 +1,4 @@
-type Props = {};
-
-const Footer = (props: Props) => {
+const Footer = () => {
   return (
     <footer className="bg-opacity-20 backdrop-filter backdrop-blur-lg border-t border-gray-300 dark:border-gray-700">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm">

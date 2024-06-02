@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { MdError, MdVerified } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { z } from "zod";
 
-import authService from "@/api/services/auth-service";
+import { AppDispatch } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,12 @@ import { Input } from "@/components/ui/input";
 
 import InfoComponent from "@/components/info";
 
+import {
+  resetPasswordReducer,
+  resetResetPasswordState,
+} from "@/features/auth/slice";
+import { resetPassword } from "@/features/auth/thunks";
+
 const ResetPasswordSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters long.",
@@ -38,10 +45,9 @@ const ResetPasswordSchema = z.object({
 const ResetPasswordPage = () => {
   const { token } = useParams();
 
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, error, success } = useSelector(resetPasswordReducer);
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -50,28 +56,25 @@ const ResetPasswordPage = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
-    setError("");
-    setSuccess("");
-    setLoading(true);
+  useEffect(() => {
+    return () => {
+      dispatch(resetResetPasswordState());
+    };
+  }, []);
 
-    if (token) {
-      authService
-        .resetPassword(token, values)
-        .then(() => {
-          setSuccess("Password reset successfully!");
-        })
-        .catch((error) => {
-          setError(
-            error.response.data.errors.map(
-              (err: { message: string; field?: string }) => err.message,
-            ),
-          );
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setError("Invalid/Expired token");
-    }
+  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
+    const payload = {
+      token: token!,
+      dto: values,
+    };
+
+    dispatch(resetPassword(payload))
+      .unwrap()
+      .then(() => {})
+      .catch(() => {})
+      .finally(() => {
+        form.reset();
+      });
   };
 
   return (
